@@ -17,6 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from api.views import login, signup, test_token, create_article
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/', login, name='login'),
+    path('register/', signup, name='signup'),
+    path('test-token/', test_token, name='test'),
+    path('article/create/', create_article, name='create_article'),
 ]
