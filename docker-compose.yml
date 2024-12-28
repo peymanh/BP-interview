@@ -19,7 +19,7 @@ services:
 
   celery:
     build: .
-    command: celery -A todo worker -l INFO
+    command: celery -A bp worker -l INFO
     volumes:
       - .:/usr/src/app
     environment:
