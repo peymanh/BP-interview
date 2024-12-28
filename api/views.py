@@ -9,7 +9,8 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
 from .serializers import UserSerializer, ArticleSerializer
-from .models import Article
+from .models import Article, Rating
+from .tasks import update_rating
 
 @api_view(['POST'])
 def signup(request):
@@ -52,5 +53,34 @@ def create_article(request):
     article.save()
     return Response({'message': 'article is save', 'article_id': article.pk}, status=status.HTTP_200_OK)
 
+
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def rate_article(request):
+    user = request.user
+    article_id = request.data.get('article_id')
+    article = Article.objects.get(id=article_id)
+
+    try:
+        rating, created = Rating.objects.update_or_create(
+            user=user,
+            article=article,
+            defaults={'rate': request.data.get('rate', 3)}
+        )
+
+        update_rating.delay(article_id=article.id)
+
+        return Response({"message": "rate is saved"}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ArticleViewSet(viewsets.ModelViewSet):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
 
