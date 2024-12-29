@@ -2,7 +2,7 @@
 
 This is sample DRF project, done as the code challenge of Bitpin interview and hiring process.
 
-## Technology Stack
+## Technology Stack 
 | Name                  | Version |
 |-----------------------|---------|
 | Python                | 3.11    |
@@ -13,7 +13,7 @@ This is sample DRF project, done as the code challenge of Bitpin interview and h
 | Docker                | 23.0.5  |
 
 
-## Build and run the project With Docker
+## First Time?
 
 1. Clone the project:
 ```bash
@@ -24,7 +24,10 @@ git clone https://github.com/peymanh/BP-interview.git
 ```bash
 cd bp
 ```
-3. Make sure you have installed Docker CLI.
+3. run the migrations
+```bash
+python3 manage.py migrate
+```
 4. Simply run the project with docker compose:
 ```bash
 docker compose up --build
