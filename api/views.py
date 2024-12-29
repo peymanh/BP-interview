@@ -44,14 +44,16 @@ def test_token(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def create_article(request):
-    title = request.data.get('title')
-    content = request.data.get('content')
-    article = Article()
-    article.title = title
-    article.content = content
-    article.author = request.user
-    article.save()
-    return Response({'message': 'article is save', 'article_id': article.pk}, status=status.HTTP_200_OK)
+    serializer = ArticleSerializer(data=request.data, context={'request': request})
+
+    # Validate the data
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Save the article if validation is successful
+    serializer.save()
+    return Response({'message': 'article is saved', 'article_id': serializer.data['id']}, status=status.HTTP_200_OK)
+
 
 
 @api_view(['POST'])
