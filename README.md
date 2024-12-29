@@ -2,7 +2,7 @@
 
 This is sample DRF project, done as the code challenge of Bitpin interview and hiring process.
 
-## Technologies Used
+## Technology Stack
 | Name                  | Version |
 |-----------------------|---------|
 | Python                | 3.11    |
