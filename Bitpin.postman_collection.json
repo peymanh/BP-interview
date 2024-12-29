@@ -1,0 +1,173 @@
+{
+	"info": {
+		"_postman_id": "3bd2ad16-f56b-4fbe-aa3e-2842688ccdfc",
+		"name": "Bitpin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1240889",
+		"_collection_link": "https://hinavatech.postman.co/workspace/Hinava~b45d0595-84a7-4857-8410-5bbd700841d6/collection/1240889-3bd2ad16-f56b-4fbe-aa3e-2842688ccdfc?action=share&source=collection_link&creator=1240889"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"peyman2\",\n    \"password\": \"123123\",\n    \"email\": \"hassanabadi2.peyman@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/register/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"register",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"peyman2\",\n    \"password\": \"123123\",\n    \"email\": \"hassanabadi2.peyman@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/register/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"register",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Articles List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "token 62cc1a7e77573c08b27d49e610900839b7e714ca",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/articles",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"articles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Article",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "token 62cc1a7e77573c08b27d49e610900839b7e714ca",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Test Article\",\n    \"content\": \"This the content of the article\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/article/create/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"article",
+						"create",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rate Article",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "token 62cc1a7e77573c08b27d49e610900839b7e714ca",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"article_id\": 1,\n    \"rate\": 3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/article/rate/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"article",
+						"rate",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
