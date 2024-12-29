@@ -43,7 +43,7 @@ Now, the APIs are available on: **localhost:8000**
 | /login          | login the user with username and password                            | POST   |
 | /article/create | Creates new article with the specified title and content. AUTHORIZATION needed | POST   |
 | /article/rate   | Rated the specified article. AUTHORIZATION needed                    | POST   |
-| /articls        | Returns list of article                                              | GET    |
+| /articles       | Returns list of article                                              | GET    |
 
 
 ## Implementation Description
@@ -115,7 +115,7 @@ As you see in this model, 2 foreign keys are defined which point to the ``Articl
 Both of these columns are indexed with ``db_index=True``, because most of our searches on this model are based on these columns.
 We have a ``rate`` column in the range of ``[0,5]`` with the specified validators. Moreover we have defined time related fields which are used to calculate the age of rating that is used in calculating the ``average_rate``.
 
-Whenever a user rates and articles, we search through the model to find whether they have rated before. If true, we update the rate and if not, we insert a new row.
+Whenever a user rates an article, we search through the Rating model to find whether they have rated before or not. If true, we update the existing rate and if not, we insert a new row.
 
 ## Calculating the average rate
 As this rating service is a high-traffic service, the calculation of the average cannot be performed synchronously.
@@ -129,7 +129,7 @@ update_rating.delay(article_id=article.id)
 This way, the Rating model which contains millions of row will is accessed in another thread besides the main thread 
 and speeds up the /article/rate API.
 
-When the calulcation is completed, the ``average_rate`` and ``rate_number`` is updated on the article model.
+When the calculation is completed, the ``average_rate`` and ``rate_number`` is updated on the article model.
 This fields act like a cache for the GET service since there is no need to re-calculate them whenever the /articles service is called.
 
 ## Average Methods
@@ -175,6 +175,7 @@ return total_weighted_rates / total_weights if total_weights > 0 else 0
 There is another subsequent way to give more attention to decrease the effect of the recent rates.
 The solution is to decay the weight of  the most recent votes:
 
+
 ```python
 import numpy as np
 
@@ -194,6 +195,9 @@ return weighted_average
 > so even if we suppose that an article's rate number reaches 1M, we will have 8Mb.
 > Considering this calculation for ``weights`` and ``weighted_average`` lists too, this block of code will consume 24Mb.
 
+
+> NOTE: You can change the averaging method in the docker-compose.yml
+> AVERAGE_METHOD=decay # or simple_average, ageing_weight
 ## Article List
 
 Getting the list of articles is no pain if we already have calculated the average and rate number.
@@ -224,6 +228,21 @@ class ArticleSerializer(serializers.ModelSerializer):
 ```
 
 That ``get_user_rating`` function adds the user rating with a simple join on rating table.
+
+Here is an example of the response. Two user have rated an article 5 and 3.
+```json
+[
+    {
+        "id": 1,
+        "title": "adasdasd",
+        "content": "asdasdasdasdasdads",
+        "average_rate": 3.947368421052632,
+        "rate_number": 2,
+        "user_rating": 5
+    }
+]
+```
+
 
 ## Stay in touch
 
