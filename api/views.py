@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
-from .serializers import UserSerializer, ArticleSerializer
+from .serializers import UserSerializer, ArticleSerializer, RateArticleSerializer
 from .models import Article, Rating
 from .tasks import update_rating
 
@@ -60,23 +60,28 @@ def create_article(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def rate_article(request):
-    user = request.user
-    article_id = request.data.get('article_id')
-    article = Article.objects.get(id=article_id)
+    serializer = RateArticleSerializer(data=request.data)
+    if serializer.is_valid():
+        user = request.user
+        article_id = request.data.get('article_id')
+        article = Article.objects.get(id=article_id)
 
-    try:
-        rating, created = Rating.objects.update_or_create(
-            user=user,
-            article=article,
-            defaults={'rate': request.data.get('rate', 3)}
-        )
+        try:
+            rating, created = Rating.objects.update_or_create(
+                user=user,
+                article=article,
+                defaults={'rate': request.data.get('rate', 3)}
+            )
 
-        update_rating.delay(article_id=article.id)
+            update_rating.delay(article_id=article.id)
 
-        return Response({"message": "rate is saved"}, status=status.HTTP_200_OK)
+            return Response({"message": "rate is saved"}, status=status.HTTP_200_OK)
 
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ArticleViewSet(viewsets.ModelViewSet):

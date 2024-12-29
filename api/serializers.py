@@ -24,3 +24,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             return None
         return None
 
+class RateArticleSerializer(serializers.Serializer):
+    article_id = serializers.IntegerField(required=True)
+    rate = serializers.IntegerField(required=True, min_value=0, max_value=5)
+
