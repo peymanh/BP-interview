@@ -54,7 +54,7 @@ __________________
 In this project, we have used the default ``User`` model from ``django.contrib.auth.models``.
 Users are registered with this sample data:
 
-```commandline
+```json
 {
     "username": "peyman",
     "password": "123123",
@@ -63,7 +63,7 @@ Users are registered with this sample data:
 ```
 and in the response an auth-token is returned that should be used in authorization needed services.
 
-```commandline
+```json
 {
     "token": "62cc1a7e77573c08b27d49e610900839b7e714ca",
     "user": {
@@ -118,7 +118,7 @@ Whenever a user rates and articles, we search through the model to find whether 
 As this rating service is a high-traffic service, the calculation of the average cannot be performed synchronously.
 So, a asynchronous task is dispatched to calculate the article's average_rate.
 
-```commandline
+```python
 from .tasks import update_rating
 
 update_rating.delay(article_id=article.id) 
@@ -173,6 +173,8 @@ There is another subsequent way to give more attention to decrease the effect of
 The solution is to decay the weight of  the most recent votes:
 
 ```python
+import numpy as np
+
 decay_factor = 0.9
 ratings = [r.rate for r in ratings]
 weights = np.power(decay_factor, np.arange(len(ratings))[::-1])
@@ -187,8 +189,41 @@ return weighted_average
 >Note: The downside of this method is that the ``ratings = [r.rate for r in ratings]`` may get too big. 
 > But we should have in mind that the rates are a single digit number, equal to 8 bytes,
 > so even if we suppose that an article's rate number reaches 1M, we will have 8Mb.
-> Considering this calculation for ``weights`` and ``weighted_average``, this block of code will consume 24Mb.
+> Considering this calculation for ``weights`` and ``weighted_average`` lists too, this block of code will consume 24Mb.
 
+## Article List
 
+Getting the list of articles is no pain if we already have calculated the average and rate number.
+As we explained before, there are asynchronous workers busy calculating those numbers,
+so if we read the articles tables, we can be sure that we can be 99.999% sure that the exact average and rate number related to the articles.
+
+>Note: Pay attention that there is no overhead for calculating the average and rate number, as they are already calculated.
+> so no database join or search is needed and speed is like a bolt!
+
+There just one challenge: <i>User rate if they have rated an article</i>.
+We implement this using the lovely serializers. In the ``ArticleSerializer`` we add this code:
+
+```python
+class ArticleSerializer(serializers.ModelSerializer):
+    user_rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Article
+        fields = ['id', 'title', 'content', 'average_rate', 'rate_number', 'user_rating']
+
+    def get_user_rating(self, obj):
+        user = self.context['request'].user
+        try:
+            return obj.rating_set.get(user=user).rate
+        except Rating.DoesNotExist:
+            return None
+        return None
+```
+
+That ``get_user_rating`` function adds the user rating with a simple join on rating table.
+
+## Stay in touch
+
+- Author - Peyman Hassanabadi
 
 

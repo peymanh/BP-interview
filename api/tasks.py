@@ -1,9 +1,8 @@
 import datetime
 import os
-
 import numpy as np
-
 from celery import shared_task
+
 from .models import Rating, Article
 
 
