@@ -1,4 +1,6 @@
 import datetime
+import os
+
 import numpy as np
 
 from celery import shared_task
@@ -43,7 +45,8 @@ def update_rating(article_id):
 
     # article.average_rate = average_rating(ratings=ratings, method="simple_average")
     # article.average_rate = average_rating(ratings=ratings, method="ageing_weight")
-    article.average_rate = average_rating(ratings=ratings, method="decay")
+    method = os.environ.get("AVERAGE_METHOD", "decay")
+    article.average_rate = average_rating(ratings=ratings, method=method)
     article.rate_number = rate_number
     article.save()
     return True
